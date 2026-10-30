@@ -31,6 +31,17 @@
     ],
     "experiments": {
       "typedRoutes": false
-    }
+    },
+    "extra": {
+      "router": {
+        "asyncRoutes": {
+          "web": true
+        }
+      },
+      "eas": {
+        "projectId": "e3111fc0-d4f2-49d1-b2d6-ddf9faf68d89"
+      }
+    },
+    "owner": "harishnethi"
   }
 }
