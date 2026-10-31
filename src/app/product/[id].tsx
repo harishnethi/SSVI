@@ -3,6 +3,7 @@ import { useState } from 'react';
 import { Text, View } from 'react-native';
 import { Button, Card, colors, Empty, Field, KeyValue, ListRow, SectionTitle, Screen, Segmented, styles } from '@/components/ui';
 import { date, money, qty } from '@/lib/format';
+import { useAuth } from '@/lib/auth';
 import { notify } from '@/lib/dialog';
 import { supabase } from '@/lib/supabase';
 import type { Product, StockMovement } from '@/lib/types';
@@ -16,11 +17,13 @@ const reasonLabel: Record<StockMovement['reason'], string> = {
   sale: 'Sold',
   adjustment: 'Adjustment',
   return: 'Returned',
+  consumed: 'Used in production',
 };
 
 export default function ProductDetail() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const router = useRouter();
+  const admin = useAuth().role === 'admin';
   const [direction, setDirection] = useState<Direction>('purchase');
   const [amount, setAmount] = useState('');
   const [note, setNote] = useState('');
@@ -62,14 +65,17 @@ export default function ProductDetail() {
         <Text style={{ fontSize: 32, fontWeight: '800', color: Number(p.stock) <= Number(p.low_stock) ? colors.danger : colors.primary, marginVertical: 8 }}>
           {qty(p.stock)} <Text style={{ fontSize: 18 }}>{p.unit}</Text>
         </Text>
-        <KeyValue label="Price" value={`${money(p.price)} / ${p.unit}`} />
-        <KeyValue label="GST" value={`${Number(p.gst_rate)}%`} />
+        <KeyValue label="Type" value={p.kind === 'raw' ? 'Paddy / raw material' : 'Murmura for sale'} />
+        {admin && <KeyValue label="Price" value={`${money(p.price)} / ${p.unit}`} />}
+        {admin && <KeyValue label="GST" value={`${Number(p.gst_rate)}%`} />}
         {!!p.sku && <KeyValue label="SKU" value={p.sku} />}
         {!!p.hsn && <KeyValue label="HSN" value={p.hsn} />}
         <KeyValue label="Low stock alert at" value={`${qty(p.low_stock)} ${p.unit}`} />
-        <KeyValue label="Stock value" value={money(Number(p.stock) * Number(p.price))} />
+        {admin && <KeyValue label="Stock value" value={money(Number(p.stock) * Number(p.price))} />}
       </Card>
-      <Button title="Edit product" icon="create-outline" variant="secondary" onPress={() => router.push({ pathname: '/product/edit', params: { id: p.id } })} />
+      {admin && (
+        <Button title="Edit product" icon="create-outline" variant="secondary" onPress={() => router.push({ pathname: '/product/edit', params: { id: p.id } })} />
+      )}
 
       <SectionTitle>Stock in / out</SectionTitle>
       <Card>
@@ -102,7 +108,7 @@ export default function ProductDetail() {
             />
           ))
         ) : (
-          <Text style={{ padding: 14, color: colors.muted, backgroundColor: '#fff' }}>No stock changes yet</Text>
+          <Text style={{ padding: 14, color: colors.muted, backgroundColor: colors.card }}>No stock changes yet</Text>
         )}
       </View>
     </Screen>

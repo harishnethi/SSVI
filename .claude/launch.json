@@ -4,8 +4,25 @@
     {
       "name": "ssvi-web",
       "runtimeExecutable": "node",
-      "runtimeArgs": ["node_modules/expo/bin/cli", "start", "--web", "--port", "8081"],
+      "runtimeArgs": [
+        "node_modules/expo/bin/cli",
+        "start",
+        "--web",
+        "--port",
+        "8081"
+      ],
       "port": 8081
+    },
+    {
+      "name": "ssvi-site",
+      "runtimeExecutable": "node",
+      "runtimeArgs": [
+        "node_modules/expo/bin/cli",
+        "serve",
+        "--port",
+        "8090"
+      ],
+      "port": 8090
     }
   ]
 }

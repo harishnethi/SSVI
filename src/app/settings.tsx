@@ -43,7 +43,7 @@ export default function SettingsScreen() {
   };
 
   const signOut = async () => {
-    if (await confirm('Sign out?', 'You will need your email and password to sign in again.', 'Sign out')) {
+    if (await confirm('Sign out?', 'You will need to log in again (with Google or your email and password).', 'Sign out')) {
       await supabase.auth.signOut();
     }
   };

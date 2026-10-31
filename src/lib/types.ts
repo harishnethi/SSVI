@@ -35,8 +35,47 @@ export interface Customer {
   created_at: string;
 }
 
+export type Role = 'admin' | 'worker' | 'customer' | 'none';
+
+export interface Profile {
+  id: string;
+  role: Role;
+  full_name: string;
+  phone: string;
+  customer_id: string | null;
+  active: boolean;
+  created_at: string;
+}
+
+export type AttendanceStatus = 'present' | 'half_day' | 'absent' | 'leave';
+
+export interface Attendance {
+  id: string;
+  worker_id: string;
+  work_date: string;
+  status: AttendanceStatus;
+  check_in: string | null;
+  check_out: string | null;
+  note: string;
+}
+
+export interface ProductionRun {
+  id: string;
+  run_date: string;
+  paddy_id: string;
+  paddy_qty: number;
+  product_id: string;
+  qty: number;
+  note: string;
+  created_at: string;
+}
+
+/** finished = murmura for sale, raw = paddy and other inputs. */
+export type ProductKind = 'finished' | 'raw';
+
 export interface Product {
   id: string;
+  kind: ProductKind;
   name: string;
   sku: string;
   hsn: string;
@@ -52,7 +91,7 @@ export interface StockMovement {
   id: string;
   product_id: string;
   qty: number;
-  reason: 'purchase' | 'production' | 'sale' | 'adjustment' | 'return';
+  reason: 'purchase' | 'production' | 'sale' | 'adjustment' | 'return' | 'consumed';
   note: string;
   created_at: string;
 }
@@ -78,6 +117,7 @@ export interface Order {
   notes: string;
   total: number;
   invoice_id: string | null;
+  placed_by_customer: boolean;
   created_at: string;
   customers?: Pick<Customer, 'name'> | null;
 }

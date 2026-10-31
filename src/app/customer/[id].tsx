@@ -73,7 +73,7 @@ export default function CustomerDetail() {
             />
           ))
         ) : (
-          <Text style={{ padding: 14, color: colors.muted, backgroundColor: '#fff' }}>No invoices yet</Text>
+          <Text style={{ padding: 14, color: colors.muted, backgroundColor: colors.card }}>No invoices yet</Text>
         )}
       </View>
 
@@ -91,7 +91,7 @@ export default function CustomerDetail() {
             />
           ))
         ) : (
-          <Text style={{ padding: 14, color: colors.muted, backgroundColor: '#fff' }}>No orders yet</Text>
+          <Text style={{ padding: 14, color: colors.muted, backgroundColor: colors.card }}>No orders yet</Text>
         )}
       </View>
     </Screen>

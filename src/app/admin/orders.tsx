@@ -52,7 +52,12 @@ export default function Orders() {
           title={o.customers?.name ?? ''}
           subtitle={`${o.order_no} · ${date(o.order_date)}${o.delivery_date ? ' · due ' + date(o.delivery_date) : ''}`}
           right={money(o.total)}
-          badge={<Badge label={o.status} tone={statusTone[o.status]} />}
+          badge={
+            <>
+              <Badge label={o.status} tone={statusTone[o.status]} />
+              {o.placed_by_customer && <Badge label="Website" tone="success" />}
+            </>
+          }
           onPress={() => router.push({ pathname: '/order/[id]', params: { id: o.id } })}
         />
       )}

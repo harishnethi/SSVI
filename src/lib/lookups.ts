@@ -6,7 +6,7 @@ import { must } from './useData';
 export async function loadLookups() {
   const [c, p, s] = await Promise.all([
     supabase.from('customers').select('*').order('name'),
-    supabase.from('products').select('*').order('name'),
+    supabase.from('products').select('*').eq('kind', 'finished').order('name'),
     supabase.from('settings').select('*').eq('id', 1).single(),
   ]);
   return { customers: must(c) as Customer[], products: must(p) as Product[], settings: must(s) as Settings };

@@ -46,7 +46,7 @@ export default function EditCustomer() {
     if (!(await confirm('Delete customer?', 'This cannot be undone.', 'Delete'))) return;
     const { error } = await supabase.from('customers').delete().eq('id', id!);
     if (error) return notify('Could not delete', 'Customers with orders or invoices cannot be deleted.');
-    router.dismissTo('/customers');
+    router.dismissTo('/admin/customers');
   };
 
   return (

@@ -1,12 +1,12 @@
 import { Stack, useLocalSearchParams, useRouter } from 'expo-router';
 import { useEffect, useState } from 'react';
 import { Text } from 'react-native';
-import { Button, colors, Field, FieldRow, Screen } from '@/components/ui';
+import { Button, colors, Field, FieldRow, Screen, Segmented } from '@/components/ui';
 import { confirm, notify } from '@/lib/dialog';
 import { supabase } from '@/lib/supabase';
-import type { Product } from '@/lib/types';
+import type { Product, ProductKind } from '@/lib/types';
 
-const blank = { name: '', sku: '', hsn: '', unit: 'pcs', price: '0', gst_rate: '18', low_stock: '0', opening: '0' };
+const blank = { kind: 'finished' as ProductKind, name: '', sku: '', hsn: '', unit: 'kg', price: '0', gst_rate: '5', low_stock: '0', opening: '0' };
 
 export default function EditProduct() {
   const { id } = useLocalSearchParams<{ id?: string }>();
@@ -25,6 +25,7 @@ export default function EditProduct() {
         if (!data) return;
         const p = data as Product;
         setForm({
+          kind: p.kind,
           name: p.name,
           sku: p.sku,
           hsn: p.hsn,
@@ -37,13 +38,14 @@ export default function EditProduct() {
       });
   }, [id]);
 
-  const set = (k: keyof typeof blank) => (v: string) => setForm((f) => ({ ...f, [k]: v }));
+  const set = (k: Exclude<keyof typeof blank, 'kind'>) => (v: string) => setForm((f) => ({ ...f, [k]: v }));
   const num = (s: string) => (Number.isFinite(parseFloat(s)) ? parseFloat(s) : 0);
 
   const save = async () => {
     if (!form.name.trim()) return notify('Name is required');
     setSaving(true);
     const payload = {
+      kind: form.kind,
       name: form.name.trim(),
       sku: form.sku.trim(),
       hsn: form.hsn.trim(),
@@ -73,12 +75,20 @@ export default function EditProduct() {
     if (!(await confirm('Delete product?', 'Its stock history will also be deleted. Past invoices keep their lines.', 'Delete'))) return;
     const { error } = await supabase.from('products').delete().eq('id', id!);
     if (error) return notify('Could not delete', error.message);
-    router.dismissTo('/products');
+    router.dismissTo('/admin/products');
   };
 
   return (
     <Screen>
       <Stack.Screen options={{ title: id ? 'Edit product' : 'New product' }} />
+      <Segmented
+        value={form.kind}
+        onChange={(kind) => setForm((f) => ({ ...f, kind }))}
+        options={[
+          { value: 'finished', label: 'Murmura for sale' },
+          { value: 'raw', label: 'Paddy / raw material' },
+        ]}
+      />
       <Field label="Name *" value={form.name} onChangeText={set('name')} />
       <FieldRow>
         <Field label="SKU / Code" value={form.sku} onChangeText={set('sku')} autoCapitalize="characters" />

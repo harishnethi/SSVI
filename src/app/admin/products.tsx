@@ -4,13 +4,13 @@ import { FlatList, View } from 'react-native';
 import { Badge, Button, colors, Empty, ListRow, SearchBar, Segmented } from '@/components/ui';
 import { money, qty } from '@/lib/format';
 import { supabase } from '@/lib/supabase';
-import type { Product } from '@/lib/types';
+import type { Product, ProductKind } from '@/lib/types';
 import { must, useData } from '@/lib/useData';
 
 export default function Products() {
   const router = useRouter();
   const [q, setQ] = useState('');
-  const [filter, setFilter] = useState<'all' | 'low'>('all');
+  const [filter, setFilter] = useState<'all' | ProductKind | 'low'>('all');
   const { data, loading, error, reload } = useData(
     async () => must(await supabase.from('products').select('*').order('name')) as Product[],
   );
@@ -19,7 +19,7 @@ export default function Products() {
     const s = q.trim().toLowerCase();
     return (data ?? []).filter(
       (p) =>
-        (filter === 'all' || Number(p.stock) <= Number(p.low_stock)) &&
+        (filter === 'all' || p.kind === filter || (filter === 'low' && Number(p.stock) <= Number(p.low_stock))) &&
         (!s || `${p.name} ${p.sku} ${p.hsn}`.toLowerCase().includes(s)),
     );
   }, [data, q, filter]);
@@ -40,7 +40,9 @@ export default function Products() {
             value={filter}
             onChange={setFilter}
             options={[
-              { value: 'all', label: 'All products' },
+              { value: 'all', label: 'All' },
+              { value: 'finished', label: 'Murmura' },
+              { value: 'raw', label: 'Paddy' },
               { value: 'low', label: 'Low stock' },
             ]}
           />
@@ -51,7 +53,11 @@ export default function Products() {
         return (
           <ListRow
             title={p.name}
-            subtitle={[p.sku, money(p.price) + ' / ' + p.unit, `GST ${Number(p.gst_rate)}%`].filter(Boolean).join(' · ')}
+            subtitle={
+              p.kind === 'raw'
+                ? ['Paddy / raw material', p.sku].filter(Boolean).join(' · ')
+                : [p.sku, money(p.price) + ' / ' + p.unit, `GST ${Number(p.gst_rate)}%`].filter(Boolean).join(' · ')
+            }
             right={`${qty(p.stock)} ${p.unit}`}
             badge={low ? <Badge label="Low" tone="danger" /> : undefined}
             onPress={() => router.push({ pathname: '/product/[id]', params: { id: p.id } })}

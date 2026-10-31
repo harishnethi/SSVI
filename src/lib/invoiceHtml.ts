@@ -6,7 +6,8 @@ const esc = (s: string | null | undefined) =>
 const nl = (s: string) => esc(s).replace(/\n/g, '<br/>');
 
 /** Printable A4 invoice used for PDF sharing. */
-export function invoiceHtml(inv: Invoice, items: InvoiceItem[], customer: Customer, s: Settings): string {
+/** accent: theme colour for headings and table header (light shade, so it prints well). */
+export function invoiceHtml(inv: Invoice, items: InvoiceItem[], customer: Customer, s: Settings, accent = '#C2620F'): string {
   const gst = inv.tax_mode === 'gst';
   const title = gst ? 'TAX INVOICE' : 'BILL';
 
@@ -33,21 +34,21 @@ export function invoiceHtml(inv: Invoice, items: InvoiceItem[], customer: Custom
   return `<!doctype html><html><head><meta charset="utf-8"/>
 <style>
   * { box-sizing: border-box; }
-  body { font-family: Helvetica, Arial, sans-serif; color: #1b1f24; font-size: 12px; margin: 28px; }
-  h1 { font-size: 22px; margin: 0; color: #1F4E79; }
-  .title { text-align: center; font-weight: bold; font-size: 14px; letter-spacing: 2px; border: 1px solid #1F4E79; padding: 4px; margin: 14px 0; }
+  body { font-family: Helvetica, Arial, sans-serif; color: #1E1E1E; font-size: 12px; margin: 28px; }
+  h1 { font-size: 22px; margin: 0; color: ${accent}; }
+  .title { text-align: center; font-weight: bold; font-size: 14px; letter-spacing: 2px; border: 1px solid ${accent}; padding: 4px; margin: 14px 0; }
   .grid { display: flex; gap: 16px; }
   .grid > div { flex: 1; }
   .muted { color: #667085; }
   table { width: 100%; border-collapse: collapse; margin-top: 12px; }
-  th { background: #1F4E79; color: #fff; text-align: left; padding: 6px; font-size: 11px; }
-  td { padding: 6px; border-bottom: 1px solid #D9DEE5; vertical-align: top; }
+  th { background: ${accent}; color: #fff; text-align: left; padding: 6px; font-size: 11px; }
+  td { padding: 6px; border-bottom: 1px solid #E5E5E5; vertical-align: top; }
   .r { text-align: right; }
   .totals { width: 45%; margin-left: auto; }
   .totals td { border: none; padding: 3px 6px; }
-  .grand td { font-weight: bold; font-size: 14px; border-top: 2px solid #1F4E79; }
+  .grand td { font-weight: bold; font-size: 14px; border-top: 2px solid ${accent}; }
   .footer { margin-top: 28px; display: flex; justify-content: space-between; align-items: flex-end; }
-  .sign { text-align: center; width: 200px; border-top: 1px solid #1b1f24; padding-top: 4px; }
+  .sign { text-align: center; width: 200px; border-top: 1px solid #1E1E1E; padding-top: 4px; }
   .cancelled { color: #C62828; font-size: 18px; font-weight: bold; text-align: center; border: 2px solid #C62828; padding: 6px; }
 </style></head><body>
   <h1>${esc(s.business_name)}</h1>
